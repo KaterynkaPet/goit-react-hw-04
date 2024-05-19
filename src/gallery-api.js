@@ -10,7 +10,11 @@ export const getData = async (query, page) => {
                 Authorization: 'Client-ID 3zb_mbNHFZJaYMkgp6GZ997cdbHk5MllXUfJtSgzbbc'
             }
         });
-        return response.data.results;
+        const showBtn = response.data.total_pages;
+        const data = response.data.results;
+
+        return { data, showBtn };
+        
     } catch (error) {
         throw new Error('Something went wrong. Please try again later.');
     }

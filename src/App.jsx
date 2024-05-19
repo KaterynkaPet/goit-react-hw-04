@@ -20,6 +20,7 @@ function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [showBtn, setShowBtn] = useState(false);
    
   const lastImageRef = useRef(null);
 
@@ -28,13 +29,14 @@ function App() {
       const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await getData(query, page);
-        if (page === 1) {
-          setImages(data);
+        const { data, total_pages } = await getData(query, page);
+          if (page === 1) {
+            setImages(data);
+            
         } else {
           setImages(prevImages => [...prevImages, ...data]);
         }
-        
+        setShowBtn(total_pages && total_pages !== page);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -42,6 +44,8 @@ function App() {
       }
     };
     fetchData();
+    } else {
+      setShowBtn(false);
   }
   }, [query, page]);
   
@@ -75,9 +79,8 @@ function App() {
       {images.length > 0 && (
         <ImageGallery images={images} onImageClick={openModal} />
       )}
-      {images.length > 0 && !loading && (
-        <LoadMoreBtn onLoadMore={loadMoreImages} loading={loading} />
-      )}
+      {showBtn && <button> Load more ... </button >}
+        <LoadMoreBtn onLoadMore={loadMoreImages} />
       {modalOpen && (
         <ImageModal
           image={selectedImage}
@@ -85,6 +88,7 @@ function App() {
         />
       )}
       <div ref={lastImageRef} />
+      
     </div>
   )
 }
