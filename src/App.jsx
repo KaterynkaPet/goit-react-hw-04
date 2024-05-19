@@ -17,7 +17,7 @@ function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-
+  const [hasMore, setHasMore] = useState(true);
   
   const lastImageRef = useRef(null);
 
@@ -37,6 +37,11 @@ function App() {
           setImages(response.data.results);
         } else {
           setImages(prevImages => [...prevImages, ...response.data.results]);
+        }
+        if (response.data.results.length === 0) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
         }
         if (page > 1) {
           lastImageRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -85,7 +90,9 @@ function App() {
         <ImageGallery images={images} onImageClick={openModal} />
       )}
       {images.length > 0 && !loading && (
-        <LoadMoreBtn onLoadMore={ loadMoreImages} loading={loading} />
+        hasMore && images.length > 0 && !loading && (
+          <LoadMoreBtn onLoadMore={ loadMoreImages} loading={loading} />
+        )
       )}
       {modalOpen && (
         <ImageModal
