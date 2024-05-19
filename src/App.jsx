@@ -6,7 +6,7 @@ import ErrorMessage from './components/ErrorMessage/ErrorMessage'
 import ImageGallery from './components/ImageGallery/ImageGallery'
 import ImageModal from './components/ImageModal/ImageModal'
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn'
-import Loader from './components/Temp/Loader'
+import Loader from './components/Loader/Loader'
 import SearchBar from './components/SearchBar/SearchBar'
 
 import { getData } from './gallery-api'
