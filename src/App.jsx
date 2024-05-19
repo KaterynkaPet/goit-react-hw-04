@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react'
 import axios from 'axios'
-import ErrorMessage from './components/error_message/ErrorMessage'
-import ImageGallery from './components/image_gallery/ImageGallery'
-import ImageModal from './components/image_modal/ImageModal'
-import LoadMoreBtn from './components/load_more_btn/LoadMoreBtn'
-import Loader from './components/loader/Loader'
-import SearchBar from './components/search_bar/SearchBar'
 import { Toaster } from 'react-hot-toast'
+
+import ErrorMessage from './components/ErrorMessage/ErrorMessage'
+import ImageGallery from './components/ImageGallery/ImageGallery'
+import ImageModal from './components/ImageModal/ImageModal'
+import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn'
+import Loader from './components/Loader/Loader'
+import SearchBar from './components/SearchBar/SearchBar'
+
+import { getData } from './gallery-api'
 
 
 function App() {
@@ -17,42 +20,23 @@ function App() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [showBtn, setShowBtn] = useState(false);
-  
+   
   const lastImageRef = useRef(null);
-
-  const scrollToButtom = () => {
-    lastImageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  };
 
   useEffect(() => {
     if (query !== '') {
       const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('https://api.unsplash.com/search/photos', {
-          params: { query, page },
-          headers: {
-            Authorization: 'Client-ID 3zb_mbNHFZJaYMkgp6GZ997cdbHk5MllXUfJtSgzbbc'
-          }
-        });
+        const data = await getData(query, page);
         if (page === 1) {
-          setImages(response.data.results);
+          setImages(data);
         } else {
-          setImages(prevImages => [...prevImages, ...response.data.results]);
+          setImages(prevImages => [...prevImages, ...data]);
         }
-        if (response.data.results.length === 0) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
-        if (page > 1) {
-          scrollToButtom();
-        }
-        setShowBtn(response.data.total_pages && response.data.total_pages !== page);
+        
       } catch (error) {
-        setError('Something went wrong. Please try again later.');
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -61,13 +45,10 @@ function App() {
   }
   }, [query, page]);
   
-  useEffect(() => {
-    setShowBtn(images.length > 0 && hasMore && !loading);
-  }, [images.length, hasMore, loading]);
-
   const handleSearch = (newQuery) => {
     setQuery(newQuery);
     setPage(1);
+    setImages([]);
   };
     
  
@@ -94,7 +75,7 @@ function App() {
       {images.length > 0 && (
         <ImageGallery images={images} onImageClick={openModal} />
       )}
-      {showBtn && (
+      {images.length > 0 && !loading && (
         <LoadMoreBtn onLoadMore={loadMoreImages} loading={loading} />
       )}
       {modalOpen && (

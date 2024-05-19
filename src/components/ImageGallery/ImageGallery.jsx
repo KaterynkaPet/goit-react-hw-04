@@ -1,5 +1,5 @@
 import css from './ImageGallery.module.css';
-import ImageCard from '../../image_card/ImageCard';
+import ImageCard from '../ImageCard/ImageCard';
 
 const ImageGallery = ({ images, onImageClick, lastImageRef }) => {
     if (images.length === 0){
