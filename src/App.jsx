@@ -18,9 +18,13 @@ function App() {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [showBtn, setShowBtn] = useState(false);
   
   const lastImageRef = useRef(null);
 
+  const scrollToButtom = () => {
+    lastImageRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  };
 
   useEffect(() => {
     if (query !== '') {
@@ -44,8 +48,9 @@ function App() {
           setHasMore(true);
         }
         if (page > 1) {
-          lastImageRef.current.scrollIntoView({ behavior: 'smooth' });
-          }
+          scrollToButtom();
+        }
+        setShowBtn(response.data.total_pages && response.data.total_pages !== page);
       } catch (error) {
         setError('Something went wrong. Please try again later.');
       } finally {
@@ -54,7 +59,11 @@ function App() {
     };
     fetchData();
   }
-}, [query, page]);
+  }, [query, page]);
+  
+  useEffect(() => {
+    setShowBtn(images.length > 0 && hasMore && !loading);
+  }, [images.length, hasMore, loading]);
 
   const handleSearch = (newQuery) => {
     setQuery(newQuery);
@@ -76,10 +85,6 @@ function App() {
     setModalOpen(false);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="app">
       <Toaster />
@@ -89,10 +94,8 @@ function App() {
       {images.length > 0 && (
         <ImageGallery images={images} onImageClick={openModal} />
       )}
-      {images.length > 0 && !loading && (
-        hasMore && images.length > 0 && !loading && (
-          <LoadMoreBtn onLoadMore={ loadMoreImages} loading={loading} />
-        )
+      {showBtn && (
+        <LoadMoreBtn onLoadMore={loadMoreImages} loading={loading} />
       )}
       {modalOpen && (
         <ImageModal
