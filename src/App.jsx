@@ -79,8 +79,7 @@ function App() {
       {images.length > 0 && (
         <ImageGallery images={images} onImageClick={openModal} />
       )}
-      {showBtn && <button> Load more ... </button >}
-        <LoadMoreBtn onLoadMore={loadMoreImages} />
+      {showBtn && <LoadMoreBtn onLoadMore={loadMoreImages} />}
       {modalOpen && (
         <ImageModal
           image={selectedImage}
